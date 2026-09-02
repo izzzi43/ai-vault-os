@@ -86,15 +86,48 @@ Running this at the end of a working session is what stops the vault rotting.
 
 ---
 
-## What makes it survive
+## The six rules
 
-Most note systems die of bloat. Three rules keep this one small:
+Most note systems die of bloat, or of being written to once and never read. These
+six are what kept mine alive. They are ordered by how often I have broken them.
 
-- **Consolidate instead of creating.** Extend an existing note before adding one.
-- **One truth per fact.** Link canonical sources, never copy them. Two places for
-  one fact means one gets maintained and the other goes stale in silence.
-- **A new note means updating its folder index in the same move.** Skipping this
-  is drift source number one.
+**1. Follow the hub before you search.**
+If a note on the topic exists, read it before answering. Never produce a list from
+memory when the vault holds one. And "X is missing" is a factual claim that needs a
+source — an invented gap sends you off building something you already have.
+
+**2. Write back immediately, not at the end.**
+The moment you explain something that will still matter tomorrow, file it in the
+same reply. Sessions get interrupted. A finding that lives only in the chat is a
+finding you will lose, and you will not notice until you need it.
+
+**3. Consolidate instead of creating.**
+Before adding a note, check whether an existing one can absorb it. And a new note
+in a folder means updating that folder's index in the same move — skipping that is
+drift source number one.
+
+**4. Every fact is timeless, dated, or a pointer.**
+Timeless facts go in and stay. Dated facts get `(as of DD.MM.)` and a source.
+Anything that changes fast — numbers, status, prices, balances — is a pointer:
+link the live source, never copy the value. Copied status facts go stale quietly,
+which is worse than being wrong loudly.
+
+**5. Search before you build, but only for infrastructure.**
+Someone has already built the scheduler, the scraper, the dashboard. Take theirs.
+But whatever produces your own judgment — the loop where you learn from your own
+results — is the one thing worth building yourself, and the one thing you must
+never outsource.
+
+**6. The second time something goes wrong, write the rule.**
+Not the third, not the tenth. The second occurrence is the signal that it is a
+pattern and not bad luck. One line in the memory folder, with the reasoning, costs
+a minute and saves the next hour.
+
+## One truth per fact
+
+Two places holding the same fact means one gets maintained and the other goes
+stale in silence. Link canonical sources; never copy them. This applies to the
+index too — the index points at memories, it does not contain them.
 
 ## What this is not
 
