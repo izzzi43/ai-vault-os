@@ -1,0 +1,15 @@
+{
+  "note": "Ten fixed questions against the sample vault from make_vault.py. `must`: regular expressions that all have to match the answer (case-insensitive). `must_not`: expressions that must not match. `about` says which mechanism the task leans on. The judge is a word check, not a reader: it can pass a wrong answer that happens to contain the words, so read the misses AND a sample of the passes. Change a task only together with a new baseline run.",
+  "tasks": [
+    {"id": "T01", "about": "start block: inbox", "question": "What is open in the inbox right now? Answer briefly.", "must": ["\\binvoice\\b", "\\bglass\\b", "\\b(Mira|scents?)\\b"]},
+    {"id": "T02", "about": "start block: last three days", "question": "What happened the day before yesterday? Answer briefly.", "must": ["\\b(invoice|printer|newsletter)\\b"], "must_not": ["\\bNorthpost\\b.*\\bfrom today\\b"]},
+    {"id": "T03", "about": "start block: priorities", "question": "What are my active priorities at the moment?", "must": ["\\bwinter\\b", "\\blost parcels?\\b", "\\bwholesale\\b"]},
+    {"id": "T04", "about": "memory index", "question": "A customer asks for her refund today, the return parcel has no scan yet. What do I do?", "must": ["\\b(not|no|don't|do not|wait|only after|until|hold)\\b.{0,80}\\b(refund|scan)", "\\bscan"], "must_not": ["\\brefund (her|it|the customer) (now|right away|immediately|today)\\b"]},
+    {"id": "T05", "about": "area head", "question": "How long is the return window?", "must": ["\\b30 days\\b"]},
+    {"id": "T06", "about": "invalidated fact", "question": "Which shipping provider did we use before the current one, and why did we switch?", "must": ["\\bParcelOne\\b", "\\b(lost|missing)\\b"]},
+    {"id": "T07", "about": "pointer", "question": "How many cedar candles do we have in stock?", "must": ["\\b(inventory|sheet|Lumen stock)\\b"], "must_not": ["\\b\\d+\\s+(cedar\\s+)?candles\\b", "\\b(have|are|is)\\s+\\d+\\b"]},
+    {"id": "T08", "about": "body on condition", "question": "A shop wants to order wholesale. What is the minimum order?", "must": ["\\b12 units\\b|\\b12 per scent\\b|\\btwelve units\\b|\\b12\\b.{0,20}\\bper scent\\b"]},
+    {"id": "T09", "about": "fact only in an older daily note", "question": "What is the problem with the wick supplier, and is it decided?", "must": ["\\b(late|delay(ed)?|two weeks)\\b", "\\b(not (yet )?decided|undecided|no decision|still open|not been decided)\\b"]},
+    {"id": "T10", "about": "stale fact", "question": "Which kind of newsletter subject line works best for us, and how sure is that?", "must": ["\\bscent", "\\b(as of|outdated|months old|months ago|stale|due for review|overdue|not recent|old data|dated)\\b"]}
+  ]
+}
