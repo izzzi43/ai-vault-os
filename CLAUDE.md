@@ -16,6 +16,11 @@ question "do you remember what we did?" — which I should never have to ask.
 
 ## Looking things up
 
+- **Read heads first, bodies on condition.** A long note starts with a head
+  between `<!-- HEAD -->` and `<!-- /HEAD -->`: the rules that apply to almost
+  every task. For a task, read at most three heads. Read a section below the
+  head only when the task meets its condition ("only when the task is about X").
+  If you needed something that was not in a head twice, propose moving it up.
 - **Full-text search is the default entry point**, not `grep` and not guessing
   filenames. Ranked results with score and context beat unsorted hits.
 - Grep stays right for exact strings: IDs, paths, code.

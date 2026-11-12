@@ -3,6 +3,11 @@
 One paragraph: what this area is and why it matters. If you cannot write this
 in three sentences, the area is really two areas.
 
+<!-- HEAD -->
+The five to ten lines an agent needs for almost every task in this area. Keep it
+under a screen. If it grows, something in it belongs below.
+<!-- /HEAD -->
+
 ## How it works
 
 The timeless part. Mechanics, ownership, decisions that hold.

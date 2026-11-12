@@ -86,10 +86,11 @@ Running this at the end of a working session is what stops the vault rotting.
 
 ---
 
-## The six rules
+## The seven rules
 
-Most note systems die of bloat, or of being written to once and never read. These
-six are what kept mine alive. They are ordered by how often I have broken them.
+Most note systems die of bloat, or of being written to once and never read. The
+first six are what kept mine alive, ordered by how often I have broken them. The
+seventh is newer and says so.
 
 **1. Follow the hub before you search.**
 If a note on the topic exists, read it before answering. Never produce a list from
@@ -122,6 +123,21 @@ never outsource.
 Not the third, not the tenth. The second occurrence is the signal that it is a
 pattern and not bad luck. One line in the memory folder, with the reasoning, costs
 a minute and saves the next hour.
+
+**7. Give reading a budget.**
+A vault that works grows, and then the agent reads all of it before every task.
+More context is not more knowledge: past a point the rules that matter drown in
+the ones that do not. So every long note gets a **head**, a short block at the
+top with the rules that apply to almost every task, and the agent's must-read
+list is a few heads, not a few files. Everything else stays in the note and is
+read **on condition**: "read the pricing section only when the task is about
+pricing." Nothing is deleted. It moves below the head and gets a trigger.
+
+*Status: newer than the other six. In my own setup this cut the must-read text
+per task by roughly 80 percent. In a small fixed test set (10 tasks, before and
+after) the checked answers held, and the amount actually read became far more
+even across tasks. Total reading dropped by about a quarter, which is within
+twice the run-to-run noise, so treat that part as a hint, not a result.*
 
 ## One truth per fact
 
