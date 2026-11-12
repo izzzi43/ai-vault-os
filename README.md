@@ -68,8 +68,9 @@ Vault-Index.md     the map: who you are, what the folders hold, active prioritie
    before anything else, so make it honest rather than impressive.
 3. Point your agent at `CLAUDE.md`.
 4. Start today's note from `01-daily/_TEMPLATE.md`.
-5. At the end of each working day: *"Write the day into the daily note and update
-   what changed in the area notes."*
+5. While you work, not at the end of the day: the moment something comes up that
+   you will still need tomorrow, it goes into the daily note and the affected
+   area note. Before you stop, say **"checkpoint"** to catch what slipped.
 
 That last step is the whole system. Everything else is filing.
 
