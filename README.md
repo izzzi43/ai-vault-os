@@ -41,7 +41,7 @@ exists in the chat is a finding you will lose.
 | Kind | Example | How to write it |
 |---|---|---|
 | **Timeless** | How a system works, a decision, ownership | Write it, keep it |
-| **Dated** | What was true at a point in time | Add `(as of DD.MM.)` and the source |
+| **Dated** | What was true at a point in time | Add `(as of YYYY-MM-DD)` and the source |
 | **Pointer** | Numbers, status, prices, balances | **Do not copy.** Link the live source |
 
 Copied status facts are the real source of drift. They go stale quietly and
@@ -59,6 +59,10 @@ Vault-Index.md     the map: who you are, what the folders hold, active prioritie
 01-daily/          one note per day, keyword index on top
 02-areas/          standing knowledge, one note per area of responsibility
 90-memory/         distilled rules, one file per fact, plus an index that points
+hooks/             what is enforced: start block, lint after edits, reminder before stopping
+tools/             vault_lint.py and vault_search.py, plus their tests
+eval/              a small fixed test, so a change comes with numbers
+.claude/           settings.json that registers the hooks, and the consolidate skill
 ```
 
 ## Getting started
@@ -68,8 +72,9 @@ Vault-Index.md     the map: who you are, what the folders hold, active prioritie
    before anything else, so make it honest rather than impressive.
 3. Point your agent at `CLAUDE.md`.
 4. Start today's note from `01-daily/_TEMPLATE.md`.
-5. At the end of each working day: *"Write the day into the daily note and update
-   what changed in the area notes."*
+5. While you work, not at the end of the day: the moment something comes up that
+   you will still need tomorrow, it goes into the daily note and the affected
+   area note. Before you stop, say **"checkpoint"** to catch what slipped.
 
 That last step is the whole system. Everything else is filing.
 
@@ -83,6 +88,65 @@ Say **"checkpoint"** and the agent should:
 4. Commit
 
 Running this at the end of a working session is what stops the vault rotting.
+
+## What runs automatically
+
+**Read this before you open the folder in Claude Code.** The repo ships hooks in
+`.claude/settings.json`. Once you trust the folder, four small Python scripts run
+on their own. They only read the vault and print text; none of them writes a note,
+none runs anything from a note, none uses the network.
+
+| When | Script | What it does |
+|---|---|---|
+| Session start, and after a compaction | `hooks/session_start.py` | Prints the start sequence into the context: who you are, priorities, inbox, today's note, the index lines of the last three days, the memory index. Stays under 10,000 characters and says where it cut. |
+| After every edit of a note | `hooks/after_edit.py` | Lints that one note and shows at most six findings. Silent otherwise. |
+| Before Claude stops | `hooks/stop_check.py` | Reminds once per session if the session changed notes but not today's daily note. Looks only at what this session wrote. |
+| Before a compaction | `hooks/pre_compact.py` | Asks the summary to keep findings that are not filed yet. |
+
+To switch them off, delete `.claude/settings.json` or set `"disableAllHooks": true`
+in it. They need `python3` on the path (on Windows, change the command to `python`).
+
+Why hooks at all: a rule in `CLAUDE.md` is a request. A hook is the only way to make
+something happen every time.
+
+## The tools
+
+```
+python3 tools/vault_lint.py            what the rules ask for, as numbers
+python3 tools/vault_search.py "words"  ranked search without an index or a database
+python3 tools/test_tools.py            tests for both and for the hooks
+```
+
+**The lint** reports broken links, notes in areas and memory that nothing links
+to, memory files missing from the index, long notes without a head, dated facts
+without a year, notes past their review date, old inbox items, more than five
+priorities, and an inbox or memory index too long for the start block. It runs as
+step 4 of the checkpoint. On a real vault of 537 notes it takes about a quarter
+of a second.
+
+**The search** ranks by where a word is found: the `description:` line and the
+title first, then the head, then the index lines of daily notes, then the text.
+Per word only its best place counts, so a long note cannot win by length.
+
+Say **"consolidate"** once a week: the agent reads the last seven days, finds what
+repeated and proposes at most five changes, each with its evidence. It writes
+nothing before you agree.
+
+## What is measured, and what is not
+
+`eval/` holds ten fixed questions against a small sample vault. The first run
+compared this setup against the plain manual, three times each (`eval/results.md`):
+
+- Tool calls per ten questions fell from about 66 to about 25.
+- Every answer was correct in both variants.
+- The total text in the context was **not** lower: the start block and the longer
+  manual cost about what the saved reading gained.
+
+So the honest claim is "fewer steps to the same answer", not "less context". The
+lint after edits, the stop reminder, the review dates and the consolidate skill
+are **not measured yet**: the eval only reads. Known limits of the lint and the
+search are listed at the top of each script. Treat everything in this section as
+newer than the seven rules.
 
 ---
 
@@ -108,7 +172,7 @@ in a folder means updating that folder's index in the same move — skipping tha
 drift source number one.
 
 **4. Every fact is timeless, dated, or a pointer.**
-Timeless facts go in and stay. Dated facts get `(as of DD.MM.)` and a source.
+Timeless facts go in and stay. Dated facts get `(as of YYYY-MM-DD)` and a source.
 Anything that changes fast — numbers, status, prices, balances — is a pointer:
 link the live source, never copy the value. Copied status facts go stale quietly,
 which is worse than being wrong loudly.

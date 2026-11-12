@@ -11,10 +11,10 @@ reads this before anything else, so keep it current and keep it honest.)*
 
 | Folder | Holds |
 |---|---|
-| `00 Inbox` | Open handovers. Cleared first, never a parking lot. |
-| `01 Daily` | The chronicle. One note per day, index lines on top. |
-| `02 Areas` | The knowledge. Standing notes per area of responsibility. |
-| `90 Memory` | Distilled rules the agent loads every session. |
+| `00-inbox.md` | Open handovers. Cleared first, never a parking lot. |
+| `01-daily/` | The chronicle. One note per day, index lines on top. |
+| `02-areas/` | The knowledge. Standing notes per area of responsibility. |
+| `90-memory/` | Distilled rules. The agent reads the index `MEMORY.md` every session and opens single files on demand. |
 
 ## The rules that matter most
 
