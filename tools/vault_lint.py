@@ -121,9 +121,10 @@ def lint(root, a):
             for m in MDLINK.finditer(line):
                 if "://" in m.group(1):
                     continue
-                h = by_resolved.get((p.parent / m.group(1)).resolve())
+                target_path = (p.parent / m.group(1)).resolve()
+                h = by_resolved.get(target_path)
                 if h is None:
-                    if not template:
+                    if not template and not target_path.is_file():       # a file outside the vault that exists is fine
                         add("broken-link", p, n, f"({m.group(1)}) points at no note")
                 elif h != p:
                     incoming[h].add(p)
