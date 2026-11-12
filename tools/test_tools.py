@@ -37,7 +37,7 @@ def main():
         check(rc == 1 and data["stats"]["by_check"] == {"stale": 1}, "clean sample vault: one finding, the note that is due for review")
         check(data["stats"]["core_orphans"] == 0 and data["stats"]["core_notes"] == 7, "seven core notes, none orphaned")
 
-        (v / "02-areas" / "lonely.md").write_text("# Lonely\n\nSee [[nowhere]] and [gone](gone.md). ![[photo.png]] Price (as of 12.11.). Time (Stand 14:30). Fine (as of Oct 2026).\n" + "line\n" * 90, encoding="utf-8")
+        (v / "02-areas" / "lonely.md").write_text("# Lonely\n\nSee [[nowhere]] and [gone](gone.md) and [manual](../CLAUDE.md). ![[photo.png]] Price (as of 12.11.). Time (Stand 14:30). Fine (as of Oct 2026).\n" + "line\n" * 90, encoding="utf-8")
         (v / "90-memory" / "feedback_new.md").write_text("---\nname: x\n---\nA rule.\n", encoding="utf-8")
         old = (date.today() - timedelta(days=30)).isoformat()
         with (v / "00-inbox.md").open("a", encoding="utf-8") as f:
