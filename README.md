@@ -213,6 +213,14 @@ counts, so a long note cannot win by length.
 days, finds what repeated, and proposes at most five changes, each with the
 notes it comes from. It writes nothing before you agree.
 
+**Audit.** Say "audit" once a quarter. The check script finds broken links, it
+cannot tell whether a rule is still true. The agent reads every rule and every
+head and holds it against the thing it talks about: does the script still live
+there, is the routine still paused, do two rules disagree. It corrects only what
+it can prove and brings you the rest as a short list of decisions. On my own
+memory of 95 rules the first run found about two thirds true, a handful with
+moved paths, and fourteen that needed me. None of those looked broken.
+
 ## What is measured, and what is not
 
 `eval/` holds ten fixed questions against a small sample vault. The first run
