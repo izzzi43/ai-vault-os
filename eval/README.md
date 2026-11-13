@@ -27,4 +27,24 @@ Each task starts a fresh headless `claude -p` session, so 10 tasks times 3 repea
 - **Only reading is measured.** Tools are read-only in the eval, so nothing here says whether writing back
   got better.
 
+## Questions for your own vault
+
+The ten tasks cover the sample vault. For your own, write two questions per path an answer can take, so a
+miss tells you where the memory breaks:
+
+| Path | Where the answer lives | A miss means |
+|---|---|---|
+| 1 | In the manual or the start block, no lookup needed | The start does not load, or is skimmed |
+| 2 | Inside a rule file. The index names only the file | The agent guesses from the index line |
+| 3 | In an area note, one in the head, one in the body | The agent does not follow the index into the note |
+| 4 | Only in a daily note older than the start block shows | No search in the log. Or the fact belonged in an area note |
+| 5 | The answer is a pointer: right is the place where the number lives | The agent recites a copied value |
+| 6 | Something changed: right is today's state | The agent repeats the old state that still stands somewhere |
+
+Ask the way you ask at work: one sentence, no file name. For path 5 and 6 add `must_not` patterns for the
+copied value and the old state. Two things showed up on the first real run. A `must_not` that forbids any
+version number failed a correct answer, because the agent had gone to the live source and read the number
+there. And on a vault that is in decent shape nearly every answer is right before and after a change. Then
+the test is a guard against breaking something, and the numbers that move are steps and text read.
+
 Write the outcome into `results.md`, including what did not improve.
