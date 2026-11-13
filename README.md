@@ -168,6 +168,27 @@ To switch them off, delete `.claude/settings.json` or set
 `"disableAllHooks": true` in it. On Windows, change `python3` to `python` in
 that file.
 
+### Three things that fail without telling you
+
+Found while cutting the start context of a working setup (November 2026, Claude
+Code 2.1). Each one looked fine and was not.
+
+1. **A rule file with `paths:` only loads when the session started in the folder
+   that holds `.claude/rules/`, or in a folder above it.** Then it loads as soon
+   as a matching file is read, also through `sed` in the shell. A session that
+   started somewhere else and opens the same file by its full path loads
+   nothing. If your agents start in another folder, name the rule file in the
+   agent's own instructions. Test it: start a short session, read one matching
+   file, and look for a `nested_memory` entry in the transcript.
+2. **A hook that answers "ask" is no guard when the session runs with all
+   permissions granted.** The question is approved without anyone seeing it. A
+   guard that must hold has to block (exit code 2). Test every guard once with
+   a real, harmless call in a new session, not only with made-up input.
+3. **Two config folders mean two memories.** If you run Claude Code with two
+   profiles (`CLAUDE_CONFIG_DIR`), each keeps its own auto-memory for the same
+   project. Rules learned in one are missing in the other. Point both at one
+   folder with a symlink.
+
 ## The tools
 
 ```
