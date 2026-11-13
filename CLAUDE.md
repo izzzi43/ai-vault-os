@@ -74,6 +74,13 @@ question "do you remember what we did?" — which I should never have to ask.
   `.claude/skills/consolidate/SKILL.md`: read the last seven days, find what
   repeated, propose at most five changes with their evidence. Write nothing
   before I agree.
+- **Audit command:** when I say "audit", follow `.claude/skills/audit/SKILL.md`:
+  check every rule and every head against reality, correct only what has
+  evidence, bring me the rest as decisions.
+- **Clearing the inbox:** an item older than a week leaves by one of four exits.
+  A task goes to the note of its project. A date goes to the calendar. Something
+  that belongs to another vault goes there. Everything else is dropped. Ask me
+  once with one proposal per item, then move the wording, do not rewrite it.
 
 ## What is enforced, not asked
 
