@@ -110,11 +110,16 @@ def main():
         out.append("## Due for review (check against reality when you touch them)\n"
                    + "\n".join(f"- 02-areas/{n}, due since {d.isoformat()}" for d, n in sorted(due)[:3]))
     expired = []
-    for folder in (areas, root / "90-memory"):
+    try:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        from vault_lint import frontmatter          # the same reading of the frontmatter as the lint and the repair
+    except ImportError:
+        frontmatter = None
+    for folder in (areas, root / "90-memory") if frontmatter else ():
         for p in sorted(folder.glob("*.md")) if folder.is_dir() else []:
-            v = re.search(r"^valid_until:\s*(\d{4})-(\d{2})-(\d{2})\s*$", read(p), re.M)
+            v = frontmatter(read(p)).get("valid_until", "")
             try:
-                if v and date(*map(int, v.groups())) < today:
+                if re.fullmatch(r"\d{4}-\d{2}-\d{2}", v) and date.fromisoformat(v) < today:
                     expired.append(f"{folder.name}/{p.name}")
             except ValueError:                      # a wrong date is the lint's job, not a reason to lose the block
                 pass

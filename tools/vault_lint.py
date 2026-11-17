@@ -18,7 +18,7 @@ Checks
   no-year         "(as of 12.11.)": a dated fact without a year
   stale           a note whose `reviewed:` date plus `ttl:` days has passed
   expired         a note in areas or memory whose `valid_until:` has passed (tools/vault_repair.py archives it)
-  superseded      a note that another note names in `supersedes:` and that is still in place
+  superseded      a note that another note names in `supersedes:` (own folder, or a path) and that is still in place
   old-inbox       an inbox line with a date older than --inbox-days
   priorities      more than five active priorities in the index
   memory-size     the memory index is close to the size where rules get dropped
@@ -172,7 +172,7 @@ def lint(root, a):
         if p.name.startswith("_") or p == index or not (areas in p.parents or memory in p.parents):
             continue
         fm = frontmatter(text)
-        named.update({n: p for n in {p.stem.lower(), fm.get("name", "").strip().lower()} if n})
+        named.update({(p.parent, n): p for n in {p.stem.lower(), fm.get("name", "").strip().lower()} if n})
         if "valid_until" in fm:
             d = parse_day(fm["valid_until"]) if re.fullmatch(r"\d{4}-\d{2}-\d{2}", fm["valid_until"]) else None
             if d is None:
@@ -182,10 +182,14 @@ def lint(root, a):
     for p, text in texts.items():
         if p.name.startswith("_") or p == index or not (areas in p.parents or memory in p.parents):
             continue
-        for n in re.split(r"[,;]", frontmatter(text).get("supersedes", "")):
-            n = n.strip().strip("[]").lower()
+        if "supersedes" not in frontmatter(text):
+            continue
+        from vault_repair import supersedes_of           # one reading of the field, shared with the repair
+        for n in supersedes_of(text):
+            n = n.lower()
             n = n[:-3] if n.endswith(".md") else n
-            q = named.get(n)
+            q = named.get((p.parent, n)) if "/" not in n else next(
+                (x for x in texts if x.resolve() in {(p.parent / (n + ".md")).resolve(), (root / (n + ".md")).resolve()}), None)
             if q and q != p:
                 add("superseded", q, 1, f"{p.relative_to(root)} supersedes this note: run tools/vault_repair.py")
 
