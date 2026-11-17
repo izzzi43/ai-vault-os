@@ -130,6 +130,45 @@ class VaultLayout(Temp):
         self.assertIn("trial-offer.md", out.split("## Expired")[1] if "## Expired" in out else "")
 
 
+class IndexAndAbort(Temp):
+    def test_ambiguous_index_wikilink_warns_and_stays(self):
+        v = self.t / "vault"
+        note(v / "90-memory" / "MEMORY.md", "- [[old-rule]] — before\n- [New](new-rule.md)\n")
+        note(v / "90-memory" / "old-rule.md", "Reply within two days.\n")
+        note(v / "90-memory" / "new-rule.md", "---\nsupersedes: old-rule\n---\nReply within one day.\n")
+        note(v / "02-areas" / "old-rule.md", "# Same name, other folder\n\nText.\n")
+        _, got, warn = actions(v)
+        self.assertEqual(got, {("superseded", "90-memory/old-rule.md")})
+        self.assertTrue(any("fix it by hand" in w for w in warn), warn)
+        run("tools/vault_repair.py", v, "--apply")
+        self.assertIn("[[old-rule]]", (v / "90-memory" / "MEMORY.md").read_text(encoding="utf-8"))
+
+    def test_archive_log_is_written_before_the_moves(self):
+        m = self.t / "memory"
+        note(m / "MEMORY.md", "- [A](a.md) — one\n- [B](b.md) — two\n")
+        note(m / "a.md", "---\nvalid_until: 2020-01-01\n---\nAn old fact about a deadline.\n")
+        note(m / "b.md", "Something that holds.\n")
+        sys.path.insert(0, str(REPO / "tools"))
+        import argparse
+        import vault_repair
+        from datetime import date
+        a = argparse.Namespace(areas="02-areas", memory="90-memory")
+        acts, _, state = vault_repair.plan(m.resolve(), a, date(2026, 6, 1))
+        echt = os.rename
+
+        def kaputt(*_):
+            raise OSError("disk went away")
+        os.rename = kaputt
+        try:
+            with self.assertRaises(OSError):
+                vault_repair.apply(m.resolve(), acts, state, date(2026, 6, 1))
+        finally:
+            os.rename = echt
+        log = (m / "_archive" / "ARCHIVE.md").read_text(encoding="utf-8")
+        self.assertIn("- [A](a.md) — one", log, "the dropped index line is on record although the move failed")
+        self.assertTrue((m / "a.md").exists(), "nothing lost: the note is still where it was")
+
+
 class Supersedes(Temp):
     def mem(self, files):
         m = self.t / "memory"

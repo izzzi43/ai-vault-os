@@ -27,7 +27,8 @@ What it does, in this order:
 Archive means: move the file into <folder>/_archive/, take its link out of the folder index (MEMORY.md, _index.md
 or index.md; a line that links only to it goes, a line that links to more keeps the others), point links that
 resolve to it at the replacement, and log date, file, reason, replacement and the index line in
-_archive/ARCHIVE.md. To undo, move the file back and paste the index line back. Nothing is ever deleted.
+_archive/ARCHIVE.md, written before anything moves. To undo, move the file back and paste the index line back.
+Nothing is ever deleted. An index wikilink whose name fits more than one note is not touched; the dry run warns.
 
 Every write is planned first and checked before the first change: no file, index, archive folder or archive log
 may be a symlink or lie outside root, otherwise nothing is written. Temp files are created fresh (never reused).
@@ -291,7 +292,22 @@ def plan(root, a, today):
         for q in rest:
             gone.add(q)
             actions.append({"kind": "duplicate", "note": q, "into": keep})
+    for act in actions:                                      # a link the index has but nobody can resolve stays behind
+        p = act["note"]
+        idx = index_of(folder_of[p])
+        if not idx:
+            continue
+        for m in LINK.finditer(idx.read_text(encoding="utf-8", errors="replace")):
+            name = Path(m.group(1).strip()).name.lower()
+            name = name[:-3] if name.endswith(".md") else name
+            if name in names_of(p, fms[p]) and links.wiki(m.group(1)) is None:
+                warnings.append(f"{idx.relative_to(root)}: [[{m.group(1).strip()}]] may mean {p.relative_to(root)}, "
+                                "which would be archived, but the name fits more than one note: that index link stays, fix it by hand")
     return actions, warnings, {"texts": texts, "fms": fms, "folder_of": folder_of, "links": links}
+
+
+def names_of(p, fm):
+    return {n for n in (p.stem.lower(), fm.get("name", "").strip().lower()) if n}
 
 
 def add_frontmatter(text, fields):
@@ -389,25 +405,24 @@ def apply(root, actions, state, today):
     for p, target in moves:
         check_writable(p, root, "note")
 
-    for q, text in new.items():
-        old = texts.get(q)
-        if old is None:
-            old = q.read_text(encoding="utf-8", errors="replace")
-        if text != old:
-            write(q, text)
-    for arch in logs:
+    for arch, rows in logs.items():                          # the record first: an abort later loses nothing
         arch.mkdir(exist_ok=True)
-    for p, target in moves:
-        if os.path.lexists(target):
-            raise Refused(f"{target} appeared while repairing, stopped before moving {p}")
-        os.rename(p, target)                                 # a move, never a delete
-    for arch, rows in logs.items():
         log = arch / "ARCHIVE.md"
         if log.is_symlink():
             raise Refused(f"refusing to write {log}: a symlink")
         head = "" if log.exists() else LOG_HEAD
         with open(log, "a", encoding="utf-8") as f:
             f.write(head + "".join(rows))
+    for q, text in new.items():
+        old = texts.get(q)
+        if old is None:
+            old = q.read_text(encoding="utf-8", errors="replace")
+        if text != old:
+            write(q, text)
+    for p, target in moves:
+        if os.path.lexists(target):
+            raise Refused(f"{target} appeared while repairing, stopped before moving {p} (ARCHIVE.md has the plan)")
+        os.rename(p, target)                                 # a move, never a delete
 
 
 def main(argv=None):
