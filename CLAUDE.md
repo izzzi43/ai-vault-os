@@ -62,6 +62,11 @@ question "do you remember what we did?" — which I should never have to ask.
   and moves to the section "Earlier" at the bottom of the note, below the head.
   The reason for the change goes with it. Pointers are exempt: they have no
   history in the vault.
+  A whole note that is replaced gets `supersedes: <old note>` in the new note's
+  frontmatter; a note that is only true for a while gets `valid_until:
+  YYYY-MM-DD`. `python3 tools/vault_repair.py` (dry run; `--apply` does it) then
+  moves the old ones into `_archive/` and takes them out of the index. Never
+  delete a note by hand.
 - **Consolidate instead of creating.** Before adding a note, check whether an
   existing one can be extended. Bloat kills a vault. A new note in a folder means
   updating that folder's index note in the same move — skipping this is drift

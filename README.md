@@ -68,7 +68,7 @@ You need `python3` for the scripts. Nothing else is installed.
 | `02-areas/` | The knowledge. One standing note per area you are responsible for |
 | `90-memory/` | Rules about how you want to be worked with. One file per rule, plus an index |
 | `hooks/` | The scripts that run on their own |
-| `tools/` | The check script, the search, and their tests |
+| `tools/` | The check script, the search, the repair, and their tests |
 | `eval/` | A small fixed test, so a change comes with numbers |
 
 Two of these are easy to mix up. **Areas hold knowledge about your world**
@@ -194,7 +194,8 @@ Code 2.1). Each one looked fine and was not.
 ```
 python3 tools/vault_lint.py            checks the vault against the rules
 python3 tools/vault_search.py "words"  finds the note you mean
-python3 tools/test_tools.py            tests for both, and for the hooks
+python3 tools/vault_repair.py          archives what expired or was replaced (dry run; --apply does it)
+python3 tools/test_tools.py            tests for all three, and for the hooks
 ```
 
 **The check** (a "lint") turns the rules into numbers. It reports broken links,
@@ -208,6 +209,21 @@ quarter of a second.
 found: the one-line description and the title first, then the head, then the
 keyword lines of daily notes, then the rest. Per word only its best place
 counts, so a long note cannot win by length.
+
+**The repair** does the clean-up that needs no judgement, without a model.
+A note can carry two optional frontmatter fields: `valid_until: YYYY-MM-DD`
+(true through that day) and `supersedes: <note name>`. The repair archives
+expired notes, notes that a newer one supersedes, and exact duplicates (same
+text after folding case, accents and punctuation; the stronger one stays and
+takes over the other's links). Archiving means moving the file into an
+`_archive/` folder next to it, dropping its index line, and logging both in
+`_archive/ARCHIVE.md`, so every step can be undone. It never deletes, never
+follows a symlink, and works on a vault as well as on a bare memory folder with
+a `MEMORY.md` (the Claude Code auto-memory). The lint reports the same two
+fields, so a dry run is never a surprise. To run it nightly, schedule
+`python3 tools/vault_repair.py <vault> --apply` and read `_archive/ARCHIVE.md`
+now and then. Rewording two notes that say the same thing stays a job for
+"consolidate".
 
 **Consolidate.** Say "consolidate" once a week. The agent reads the last seven
 days, finds what repeated, and proposes at most five changes, each with the

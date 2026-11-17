@@ -17,6 +17,8 @@ Checks
   long-head       a head longer than --head-max lines
   no-year         "(as of 12.11.)": a dated fact without a year
   stale           a note whose `reviewed:` date plus `ttl:` days has passed
+  expired         a note in areas or memory whose `valid_until:` has passed (tools/vault_repair.py archives it)
+  superseded      a note that another note names in `supersedes:` and that is still in place
   old-inbox       an inbox line with a date older than --inbox-days
   priorities      more than five active priorities in the index
   memory-size     the memory index is close to the size where rules get dropped
@@ -43,7 +45,7 @@ DAY_MONTH = re.compile(r"\b\d{1,2}\.\s?\d{1,2}\.(?!\s?\d)|\b\d{1,2}/\d{1,2}\b(?!
 START_SHARE = {"Vault-Index.md": 1600, "inbox": 2000, "memory": 3000}    # what hooks/session_start.py can show, in characters
 ISO = re.compile(r"\b(20\d\d)-(\d\d)-(\d\d)\b")
 DMY = re.compile(r"\b(\d{1,2})\.(\d{1,2})\.(20\d\d)\b")
-SKIP_DIRS = {".git", ".obsidian", "node_modules", ".claude", "eval", "tools", "hooks", ".trash"}
+SKIP_DIRS = {".git", ".obsidian", "node_modules", ".claude", "eval", "tools", "hooks", ".trash", "_archive"}
 CODE = re.compile(r"```.*?```|`[^`\n]*`", re.S)
 
 
@@ -164,6 +166,28 @@ def lint(root, a):
                         "(expected a date YYYY-MM-DD and a number of days)")
                 elif d + timedelta(days=int(fm["ttl"])) < today:
                     add("stale", p, 1, f"reviewed {d.isoformat()}, ttl {fm['ttl']} days: check it against reality")
+
+    named = {}
+    for p, text in texts.items():
+        if p.name.startswith("_") or p == index or not (areas in p.parents or memory in p.parents):
+            continue
+        fm = frontmatter(text)
+        named.update({n: p for n in {p.stem.lower(), fm.get("name", "").strip().lower()} if n})
+        if "valid_until" in fm:
+            d = parse_day(fm["valid_until"]) if re.fullmatch(r"\d{4}-\d{2}-\d{2}", fm["valid_until"]) else None
+            if d is None:
+                add("expired", p, 1, f"`valid_until: {fm['valid_until']}` is not a date (expected YYYY-MM-DD)")
+            elif d < today:
+                add("expired", p, 1, f"valid until {d.isoformat()}: run tools/vault_repair.py to archive it")
+    for p, text in texts.items():
+        if p.name.startswith("_") or p == index or not (areas in p.parents or memory in p.parents):
+            continue
+        for n in re.split(r"[,;]", frontmatter(text).get("supersedes", "")):
+            n = n.strip().strip("[]").lower()
+            n = n[:-3] if n.endswith(".md") else n
+            q = named.get(n)
+            if q and q != p:
+                add("superseded", q, 1, f"{p.relative_to(root)} supersedes this note: run tools/vault_repair.py")
 
     inbox = root / a.inbox
     if inbox.is_file():

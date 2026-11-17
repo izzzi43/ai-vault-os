@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Tests for the lint, the search and the hooks, on a vault built in a temp folder. No network, no cost.
+"""Tests for the lint, the search, the repair and the hooks, on a vault built in a temp folder. No network, no cost.
 
     python3 tools/test_tools.py
 """
@@ -107,6 +107,8 @@ def main():
         check("not yet written into the vault" in out, "pre compact: prints instructions for the summary")
         json.loads((REPO / ".claude" / "settings.json").read_text(encoding="utf-8"))
         check(True, "settings.json is valid JSON")
+    rc, out = run("tools/test_vault_repair.py")
+    check(rc == 0, "repair: tools/test_vault_repair.py is green" + ("" if rc == 0 else "\n" + out[-1500:]))
     print("\n" + ("all green" if not FAILED else f"{len(FAILED)} failed"))
     return 1 if FAILED else 0
 
